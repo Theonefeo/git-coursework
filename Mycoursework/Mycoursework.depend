@@ -1,8 +1,11 @@
 # depslib dependency file v1.0
-1589572116 source:/home/feodor/git-coursework/Mycoursework/main.cpp
+1589735549 source:/home/feodor/git-coursework/Mycoursework/main.cpp
 	<iostream>
 	<cmath>
 	<cstdlib>
 	<ctime>
 	<fstream>
+	<vector>
+	<cstring>
+	<string>
 
