@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
-#include <vector>
-#include <cstring>
 #include <string>
 using namespace std;
 //Запись в файл рандомных чисел
@@ -13,7 +11,7 @@ void file()
     int bb;
     cin>>bb;
     int b[bb];
-    ofstream fout("f.txt");
+    ofstream fout("input.txt");
     for(int i=0; i<bb; i++)
     {
         b[i]=rand()%10;
@@ -21,124 +19,69 @@ void file()
     }
     fout.close();
 }
-//Функция разделения "большого" файла на массивы
-void Splitting_a_File()
+//Сортировка массива чисел которые "вмещаются" в оперативную память
+void sort(string *& arr, int n)
 {
-    int s[50];
-    int ss[100];
-    //Запись содержимого файла в массив для того,чтобы потом из массивa распределить элементы по файлам
-    ifstream fin("f.txt");
-    //vector<int>v;
-    //пока файл не пуст проходим по нему
-    while(!fin.eof())
-    {
+    //Сортировка Шeлла
+    int d = n / 2; //Длина промежутков между элементами
 
-        for(int i=0; i<50; i++)
+    while (d > 0)
+    {
+        for (int i = 0; i < n - d; i++)
         {
-            //string s;
-            //getline(ifs, s);
-            fin>>s[i];
-        }
-        for(int i=50; i<100; i++)
-        {
-            //string s;
-            //getline(ifs, s);
-            fin>>ss[i];
-        }
-    }
-    fin.close();
-    cout<<endl;
-    //cout<<"f2"<<endl;
-    //int sf2[50];
-    vector<int>v;
-    int as;
-    //Копирование полунормального массива в нормальный
-    for (int i = 50; i <100; i++)
-    {
-
-        as = ss[i];
-       v.push_back(as);
-    }
-    int sf2[50];
-    for (int i = 0; i <50; i++)
-    {
-
-
-       sf2[i] = v.at(i);
-    }
-
-    //перенос элементов из массива в доп файл f1
-    ofstream fout("f1.txt");
-    for(int i = 0; i<50; i++)
-    {
-
-        fout<<s[i]<<" ";
-
-
-    }
-    fout.close();
-    //перенос элементов из массива в доп файл f2
-    ofstream fout1("f2.txt");
-    for(int i = 0; i<50; i++)
-    {
-
-        //fout1<<ss[i]<<" ";
-        fout1<<sf2[i]<<" ";
-        //v.pop_back();
-    }
-
-    fout1.close();
-
-}
-void Vvod(int n, float* a)//создание массива
-{
-    for(int i=0; i<n; i++)//рандомное заполнение массива
-    {
-        a[i]=rand()%10;
-    }
-}
-
-void Vyvod(int n, float* a)//вывод массива
-{
-    int i;
-    for(i=0; i<n; i++)
-    {
-        cout<<a[i]<<" ";
-
-    }
-    cout<<"\n";
-}
-
-void Sortirovka(int n, float* a)///сортировка выборочная
-{
-    int i;
-    int imin = 0;
-
-    for(i=0; i<n-1; i++)//цикл в цикле
-    {
-
-        imin = i;
-        for(int j=i+1; j<n; j++)
-        {
-            if(a[j]<a[imin])///если текущий элемент меньше минимума
+            int j = i;
+            while (j >= 0 && arr[j] > arr[j + d])
             {
-                imin = j;
+                    string temp = arr[j];
+                    arr[j] = arr[j + d];
+                    arr[j + d] = temp;
+
+                j--;
             }
         }
+        d = d/2;
+    }
+}
+//Чтение из большого файла элементов в массив строк(размер массива - количество "вмещающихся элементов")
+string* readFromFile(ifstream &fin, int n)
+{
+    string *arr = new string[n];
+    string buff;
+    for (int i = 0; !fin.eof() && i < n; i++)
+    {
+        getline(fin, buff);
+        arr[i] = buff;
+    }
 
-        swap(a[i], a[imin]);///меняем местами текущий элемент с минимальным
-
-
+    return arr;
+}
+//Печатаем массивы на экране - проверяем их содержимое
+void print(string arr[], int N)
+{
+    cout << "[";
+    for (int i = 0; i < N; i++)
+    {
+        cout << arr[i] << " ";
+    }
+    cout << "]" << endl;
+}
+//Функция  записи в один из файлов массива из "вмещающихся" элементов
+void writeToFile(string *& arr, int n, ofstream &fout)
+{
+    for(int i=0;i<n;++i)
+    {
+    fout<<arr[i]<<" ";
     }
 }
 int main()
 {
+
     //cout<<"Please inter the element in the file ";
     //file();
     //проверка на то, пустой ли файл или нет
-    const char filename[] = "f.txt";
+    //const char filename[] = "input.txt";
 
-    FILE* f = fopen(filename, "rb");
+    /*FILE* f = fopen(filename, "rb");
     if(!f)
     {
         cout << "File is not exists" << endl;// файл не найден
@@ -152,22 +95,42 @@ int main()
         cout << "File contains data" << endl; // в файле находятся данные
     else
         cout << "File NOT contains data" << endl; //в файле не находятся данные - файл пустой
+     */
+////////////////
+    ifstream fin("input.txt");
+    if (!fin)
+    {
+        cerr << "Uh oh, file could not be opened for reading!" << endl;
+        return -1;
+    }
+
+    ofstream fout1("A.txt");
+    ofstream fout2("B.txt");
+
+    string *arr;
+
+    cout<<"PLease enter the parametr for memory limit:  ";
+    int N ;
+    cin>>N;
+    for (int i = 0; !fin.eof(); ++i)
+    {
+
+        arr = readFromFile(fin, N);
+        sort(arr,N);
+        print(arr, N);
+        //Разбивка файла на части(на 2 файла меньшего размера поочередено записывая в них элементы из большого)
+        if(i%2==0)
+        {
+            writeToFile(arr, N, fout2);
+        }
+        else
+            writeToFile(arr, N, fout1);
+    }
+    delete[] arr;
 
 
-
-    //int n;
-    //float a[100];
-    //cout<<"Inter n ";
-    //cin>>n;
-    //cout<<endl;
-    //Vvod(n, a);
-    //Vyvod(n, a);
-    //Разбивка файла на части(на другие файлы меньшего размера)
-    Splitting_a_File();
-    /*int d[10];
-
-    //cout<<"Sorted array "<<endl;
-    //Sortirovka(n, a);
-    //Vyvod(n, a);*/
+    fin.close();
+    fout1.close();
+    fout2.close();
     return 0;
 }
