@@ -167,9 +167,9 @@ void merge(string *a, int &i, string *b, int &j, string *c, int &p, int n, int &
     {
         if (a[i] < b[j])
         {
-                c[p] = a[i];
-                i++;
-                p++;
+            c[p] = a[i];
+            i++;
+            p++;
 
         }
         else if(a[i] > b[j])
@@ -194,9 +194,9 @@ void merge(string *a, int &i, string *b, int &j, string *c, int &p, int n, int &
                     writeToFileC(c, N, foutC); //чтение в файл С
                     p =0;
                     NNp++; //Пометка для того чтобы читать либо в файл С либо в файл Д
-                    if(NNp>2)
+                    if(NNp==2)
                     {
-                        flag == false;
+                        flag = false;
                         merge(a, i, b,j, c, p, N/2, NNp, flag, N ,foutC, foutD);
                     }
                     else
@@ -210,10 +210,10 @@ void merge(string *a, int &i, string *b, int &j, string *c, int &p, int n, int &
                     writeToFileD(c, N, foutD);
                     p = 0;
                     NNp++;
-                    if(NNp>=4)
+                    if(NNp==4)
                     {
                         NNp = 0;
-                        flag == true;
+                        flag = true;
                         merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
                     }
                     else
@@ -232,15 +232,15 @@ void merge(string *a, int &i, string *b, int &j, string *c, int &p, int n, int &
                     if(flag == true && NNp<2)
                     {
                         //writeFromFrrayC(foutC, foutD, c, N, a, i, b, j,p );
-                    cout<<"writeToFileC: ";
-                    printC(c, N);
-                    cout<<endl;
+                        cout<<"writeToFileC: ";
+                        printC(c, N);
+                        cout<<endl;
                         writeToFileC(c, N, foutC); //чтение в файл С
                         p =0;
                         NNp++; //Пометка для того чтобы читать либо в файл С либо в файл Д
-                        if(NNp>2)
+                        if(NNp==2)
                         {
-                            flag == false;
+                            flag = false;
                             merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
                         }
                         else
@@ -249,16 +249,16 @@ void merge(string *a, int &i, string *b, int &j, string *c, int &p, int n, int &
                     else if(flag == false && NNp<4)
                     {
 
-                    cout<<"writeToFileD: ";
-                    printC(c, N);
-                    cout<<endl;
+                        cout<<"writeToFileD: ";
+                        printC(c, N);
+                        cout<<endl;
                         writeToFileD(c, N, foutD);
                         p = 0;
                         NNp++;
-                        if(NNp>=4)
+                        if(NNp==4)
                         {
                             NNp = 0;
-                            flag == true;
+                            flag = true;
                             merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
                         }
                         else
@@ -281,7 +281,7 @@ int main()
     //const char filename[] = "input.txt";
 
     /*FILE* f = fopen(filename, "rb");
-    if(!f)
+    if(!file)
     {
         cout << "File is not exists" << endl;// файл не найден
 
@@ -367,12 +367,12 @@ int main()
     readFromFileB(finB, N/2, b);
     int n = N/2;
     int i = 0, j= 0, p=0;
-    int Np=0;
+    //int Np=0;
     int NNp = 0;
     bool flag = true;
     //в цикле
 //Попеременное чтение из файлов А и В отрезков длиною 5(в массив а-5эл и в-5эл) и дальнейшее копирование слиянием в результирующие массивы с и d с записью их в соответсвующие файлы
-  for(int pi=0; !finA.eof() && !finB.eof(); ++pi)
+    for(int pi=0; !finA.eof() && !finB.eof(); ++pi)
 
     {
 
@@ -381,43 +381,46 @@ int main()
         //Если количество элементов массива с равно 10 (ограничение на оп.память) то записываем  его в файл С
         if(p == n*2)
         {
-            //Последующие логические выборы - средство для достижения поочередной записи(2 раза подряд в один и тот же файл) массивов в файлы С и Д
-            //Функция записывания отрезка размером 5 в файлы С и Д
-            //writeFromFrrayC(foutC, foutD, c, N, a, i, b, j,p );
-            //Функция выгрузки массива с в файлы С и Д
-//void writeFromFrrayC(ofstream &foutC, ofstream &foutD, string *c,int N, string *a, int &i, string *b, int &j,int &p )
-            if(Np<2)
+
+            if(flag == true && NNp<2)
             {
-            cout<<"writeToFileC: ";
-                    printC(c, N);
-                    cout<<endl;
-                //записать массив c в файл С
-                writeToFileC(c, N, foutC);
+                //writeFromFrrayC(foutC, foutD, c, N, a, i, b, j,p );
+                cout<<"writeToFileC: ";
+                printC(c, N);
+                cout<<endl;
+                writeToFileC(c, N, foutC); //чтение в файл С
                 p =0;
-                Np++;
-                //Заходим в функцию чтобы продолжить слияние при опустошенном массиве С
-                merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
-            }
-            else if(Np>=2 && Np<4)
-            {
-            cout<<"writeToFileD: ";
-                    printC(c, N);
-                    cout<<endl;
-                //записать массив c в файл D
-                writeToFileD(c, N, foutD);
-                p =0;
-                Np++;
-                if(Np>=4)
+                NNp++; //Пометка для того чтобы читать либо в файл С либо в файл Д
+                if(NNp==2)
                 {
-                    Np=0;
-                    //Переходим к слиянию
+                    flag = false;
+                    merge(a, i, b,j, c, p, N/2, NNp, flag, N ,foutC, foutD);
+                }
+                else
+                    merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
+            }
+            else if(flag == false && NNp<4)
+            {
+                cout<<"writeToFileD: ";
+                printC(c, N);
+                cout<<endl;
+                writeToFileD(c, N, foutD);
+                p = 0;
+                NNp++;
+                if(NNp==4)
+                {
+                    NNp = 0;
+                    flag = true;
                     merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
                 }
                 else
                     merge(a, i, b,j, c, p, N/2, NNp, flag, N, foutC, foutD);
             }
-
-
+            //Последующие логические выборы - средство для достижения поочередной записи(2 раза подряд в один и тот же файл) массивов в файлы С и Д
+            //Функция записывания отрезка размером 5 в файлы С и Д
+            //writeFromFrrayC(foutC, foutD, c, N, a, i, b, j,p );
+            //Функция выгрузки массива с в файлы С и Д
+//void writeFromFrrayC(ofstream &foutC, ofstream &foutD, string *c,int N, string *a, int &i, string *b, int &j,int &p )
         }
         //если указатель дошел до конца массива а(то есть i указывает на последний элемент)-значит массив полностью прочитан и его надо перезаписать
         else if(i == n)
