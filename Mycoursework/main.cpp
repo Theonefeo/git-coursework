@@ -93,7 +93,7 @@ void printC(string *c, int N)
     cout << "]" << endl;
 }
 //Функция слияния элементов массива а и б в результирующий с(д)
-void merge(string *a, int &i, int &n_i, string *b, int &j, int &n_j, string *c, int &p, int n) //n_i, n_j - для случая, если в a и b записалось меньше чем n элементов
+void merge(string *a, int &i, int &n_i, string *b, int &j, int &n_j, string *c, int &p, int n, int currentAmountOfPortionsToWrite, int p_cntA, int p_cntB, ifstream &fin1, ifstream &fin2, ofstream &fout1, ofstream &fout2, int &writePortionCount, bool &writeElementsToFout1) //n_i, n_j - для случая, если в a и b записалось меньше чем n элементов
 {
 
     if (n_i == 0) // считываем и записываем в с хвост оставшегося файла, без слияния
@@ -116,41 +116,134 @@ void merge(string *a, int &i, int &n_i, string *b, int &j, int &n_j, string *c, 
     }
 
 //Слияние: идем по массивам а и b сравнивая элемемнты и заполняя массив с(д) который потом запишим в файл С(Д)
-    while ( !(i == n_i && j == n_j && p == n*2))
+    //while ( !(i == n_i && j == n_j && p == n*2))
+    //{
+    //int
+    p_cntA = 0, p_cntB = 0; //Cчетчик для отслеживания количества перезаписей массивов А и Б
+    //const_cnt = 2
+    //currentAmountOfPortionsToWrite; /*здесь переменная чтения количества порций из файлов А/В, на первом шаге должны считать по 2 раза, т.к. сортированные порции всего по 10, для порций по 20 переменная должна быть 4, для 40 — 8 и т.д. */;
+    //int ia = 0, ib = 0, ic = 0;
+    //readFromA(а, 5 /*5 элементов*/); //Прочитали уже до функции мердж и по сути уже заходим сюда с полными массивами
+    //readFromB(b, 5 /*5 элементов*/);
+    do
     {
-
-        if (j!=n_j)
+        while(p < 10 /*&& !(fin1.eof() || fin2.eof())*/)
         {
             if(i!=n_i)
             {
-            if(a[i] < b[j])
-            {
-                c[p] = a[i];
-                i++;
-                p++;
+                if(j!=n_j)
+                {
+                    if(a[i] < b[j])
+                    {
+                        c[p] = a[i];
+                        i++;
+                        if(i >= n && p_cntA < currentAmountOfPortionsToWrite-1)  // если один массив а прошли — читаем еще раз из файла А
+                        {
+                            // читаем только в случае, когда эта порция 2я
+                            //ReadFromA(a, 5 /*5 элементов*/);
+                            cout << "Print massv a  do perezanisi ";
+                            print(a, n_i);
+                            cout << "Print massv c ";
+                            print(c, n*2);
+                            cout << endl << endl;
+                            n_i = readFromFile(fin1, n, a);
+                            i = 0;
+                            p_cntA++;
+                            cout << "Print massv a  posle perezanisi ";
+                            print(a, n_i);
+                        }
+                    }
+                    else
+                    {
+                        c[p] = b[j];
+                        j++;
+                        if(j >= n && p_cntB < currentAmountOfPortionsToWrite-1)  // если один массив b прошли — читаем еще раз из файла B
+                        {
+                            // читаем только в случае, когда эта порция 2я
+                            //ReadFromB(b, 5 /*5 элементов*/);
+                            cout << "Print massv b do perezapici ";
+                            print(b, n_j);
+                            cout << "Print massv c ";
+                            print(c, n*2);
+                            cout << endl << endl;
+                            n_j = readFromFile(fin2, n, b);
+                            j = 0;
+                            p_cntB++;
+                            cout << "Print massv b posle perezapici ";
+                            print(b, n_j);
+                        }
+                    }
+                    p++;
+                }
             }
-            else if(a[i]>=b[j])
+
+            if(i==n_i && p!=10 && p_cntA >= currentAmountOfPortionsToWrite-1)
             {
                 c[p] = b[j];
                 j++;
                 p++;
             }
+            else if(j==n_j && p!=10 && p_cntB >= currentAmountOfPortionsToWrite-1)
+            {
+                c[p]=a[i];
+                i++;
+                p++;
             }
-        }
-        if(i==n_i && p!=n*2)
-        {
-            c[p] = b[j];
-            j++;
-            p++;
-        }
-        else if(j==n_j && p!=n*2)
-        {
-            c[p]=a[i];
-            i++;
-            p++;
-        }
 
+
+        }
+        cout << "writeToFileC: ";
+        printC(c, 10);
+        cout << endl;
+
+        if (writeElementsToFout1 == true)
+        {
+            writeToFile(fout1, p, c);
+        }
+        else
+        {
+            writeToFile(fout2, p, c);
+        }
+        p = 0;
+        writePortionCount++;
+        //writeToC(c, 10); // по идее где-то тут должна быть логическая развязка в какой файл писать
+        //ic = 0;
+        //if(p_cntA + p_cntB >= currentAmountOfPortionsToWrite-2 )
+          //n_i, n_j = 0; //От лишних перезаписей массивов а и б и соотвественно массива с
     }
+    while(i < n && j < n);  // прошли оба массива до конца
+    /* if (j!=n_j)
+     {
+         if(i!=n_i)
+         {
+             if(a[i] < b[j])
+             {
+                 c[p] = a[i];
+                 i++;
+                 p++;
+             }
+             else if(a[i]>=b[j])
+             {
+                 c[p] = b[j];
+                 j++;
+                 p++;
+             }
+         }
+     }
+     if(i==n_i && p!=n*2)
+     {
+         c[p] = b[j];
+         j++;
+         p++;
+     }
+     else if(j==n_j && p!=n*2)
+     {
+         c[p]=a[i];
+         i++;
+         p++;
+     }
+
+    } */
     /*while (i < n_i && j < n_j && p < n)
     {
 
@@ -181,7 +274,7 @@ void sortControl(/*лимит буффера. 5 по умолчанию*/int n =
     string c[n*2];
     int i = 0, j = 0, p = 0;
     int n_i = n, n_j = n;
-
+    int p_cntA = 0, p_cntB = 0; //Cчетчик для отслеживания количества перезаписей массивов А и Б
     do
     {
 
@@ -218,8 +311,8 @@ void sortControl(/*лимит буффера. 5 по умолчанию*/int n =
         if (!fin1 || !fin2)
             cerr << "Uh oh, file could not be opened for reading!" << endl;
 
-        readFromFile(fin1, n, a); //Так как мы заходим в функцию с массивыми пустыми то мы должны их заполнить соотсветсвенно элементами
-        readFromFile(fin2, n, b);
+        //readFromFile(fin1, n, a); //Так как мы заходим в функцию с массивыми пустыми то мы должны их заполнить соотсветсвенно элементами
+        //readFromFile(fin2, n, b);
 
 //		ofstream *curFout = &fout1;
 
@@ -245,50 +338,56 @@ void sortControl(/*лимит буффера. 5 по умолчанию*/int n =
             cout << "Print massv c ";
             print(c, n*2);
             cout << endl << endl;*/
+            readFromFile(fin1, n, a); //Так как мы заходим в функцию с массивыми пустыми то мы должны их заполнить соотсветсвенно элементами
+            readFromFile(fin2, n, b);
 
-            merge(a, i, n_i, b, j, n_j, c, p, n);
-
-            cout << "Print massv a  ";
+            merge(a, i, n_i, b, j, n_j, c, p, n, currentAmountOfPortionsToWrite, p_cntA, p_cntB, fin1, fin2, fout1, fout2, writePortionCount, writeElementsToFout1);
+            i = 0, j = 0;//, p = 0;
+            /*cout << "Print massv a  ";
             print(a, n_i);
             cout << "Print massv b ";
             print(b, n_j);
             cout << "Print massv c ";
             print(c, n*2);
-            cout << endl << endl;
-
+            cout << endl << endl;*/
+            /*
             if (p >= n*2) //Если количество элементов массива с равно 10 (ограничение на оп.память) то записываем его в файл С
             {
-                cout << "writeToFileC: ";
-                printC(c, n*2);
-                cout << endl;
+              cout << "writeToFileC: ";
+              printC(c, n*2);
+              cout << endl;
 
-                if (writeElementsToFout1 == true)
-                {
-                    writeToFile(fout1, p, c);
-                }
-                else
-                {
-                    writeToFile(fout2, p, c);
-                }
-                p = 0;
-                writePortionCount++;
+              if (writeElementsToFout1 == true)
+              {
+                  writeToFile(fout1, p, c);
+              }
+              else
+              {
+                  writeToFile(fout2, p, c);
+              }
+              p = 0;
+              writePortionCount++;
             }
             //если указатель дошел до конца массива а(то есть i указывает на последний элемент)-значит массив полностью прочитан и его надо перезаписать
             if (i >= n_i && p==0)
             {
-                //перезапись массива а
-                n_i = readFromFile(fin1, n, a);
-                i = 0;
+              //перезапись массива а
+              n_i = readFromFile(fin1, n, a);
+              i = 0;
             }
             //если указатель дошел до конца массива б-значит массив полностью прочитан и его надо перезаписать
             if (j >= n_j && i==0 && p==0)
             {
-                //перезапись массива b
-                n_j = readFromFile(fin2, n, b);
-                j = 0;
+              //перезапись массива b
+              n_j = readFromFile(fin2, n, b);
+              j = 0;
+            }*/
+            if (fin1.eof() || fin2.eof())
+            {
+            cout << "один из файлов A,B,C,D пуст" << endl;
             }
-
-        }while (n_i + n_j >= n*2);   //выйдем из цикла, когда в 2 массива запишется меньше, чем n элементов
+        }
+        while (n_i + n_j >= n*2);    //выйдем из цикла, когда в 2 массива запишется меньше, чем n элементов
 
         if (p > 0)
         {
