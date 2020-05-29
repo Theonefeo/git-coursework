@@ -208,7 +208,7 @@ void merge(ifstream &fin1, ifstream &fin2, ofstream &fout1, ofstream &fout2, int
 }
 
 //Функция выполняющая 2 часть алгоритма - попеременное записи и чтение то файлов А и В то файлов С  и Д
-void sortControl(/*лимит буффера. у тебя - 10 по умолчанию*/int n, /*количество сортируемых данных*/ int M)
+void sortControl(/*лимит буффера*/int n, /*количество сортируемых данных*/ int M)
 {
 	int currentAmountOfPortionsToWrite = 1;
 	bool read_fileA_and_fileB = true;
@@ -303,20 +303,3 @@ int main()
 
  return 0;
 }
-/*else if(a[i]==b[j] && (i!=n_i || i!=n_j))
-		{
-		     if(i!=n_i)
-		     {
-              c[p] = a[i];
-              i++;
-              p++;
-             }
-             else if(j!=n_j)
-             {
-                c[p] = b[j];
-                j++;
-                p++;
-             }
-        }
-    */
-
