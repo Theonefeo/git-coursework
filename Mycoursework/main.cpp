@@ -129,7 +129,7 @@ void merge(ifstream &fin1, ifstream &fin2, ofstream &fout1, ofstream &fout2, int
 
 		if (i == n_i)
 		{
-			if (readPortionsFromFin1 < currentAmountOfPortionsToWrite / 2) //дело в том, что мы читаем файл по порциям и мы можем залезть на следующую порцию, которая по плану должна сливаться в следующий массив с. см.скриншоты книги, которые я тебе скидывал.
+			if (readPortionsFromFin1 < currentAmountOfPortionsToWrite / 2) //дело в том, что мы читаем файл по порциям и мы можем залезть на следующую порцию, которая по плану должна сливаться в следующий массив с
 			{
 				n_i = readFromFile(fin1, n, a);
 				readPortionsFromFin1++;
@@ -297,7 +297,6 @@ int main()
 //////////////////////////////// 2 этап реализации алгоритма
     cout<<"Vvedite eshe ras rasmer byfera ";
     cin>>N;
-	//новый sortControl, новый merge, новый взгляд на ситуацию!
 	sortControl(N, M);
 
 	cout<<"смотрите файл A.txt или C.txt, в одном из них все отсортированные записи!";
